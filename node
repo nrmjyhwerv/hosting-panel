@@ -46,7 +46,7 @@ echo "* Installed Dependencies"
 echo "* Installing Files"
 
 # Create directory, clone repository, and install files
-git clone https://github.com/nrmjyhwerv/panel/node && cd node && npm install
+git clone https://github.com/nrmjyhwerv/node && cd node && npm install
 
 echo "* paste your configure"
 
