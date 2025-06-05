@@ -52,7 +52,7 @@ echo_message "* Installed Dependencies"
 echo_message "* Installing Files"
 
 # Create directory, clone repository, and install files
-git clone https://github.com/nrmjyhwerv/cryptalis.git && mv cryptalis panel && cd panel && npm install && npm run seed && npm run createUser && node .
+git clone https://github.com/nrmjyhwerv/vweve.git && mv vweve panel && cd panel && npm install && npm run seed && npm run createUser && node .
 
 echo_message "* Installed Files"
 echo_message "* Starting cryptalis"
