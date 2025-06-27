@@ -1,0 +1,5 @@
+  1. bash <(curl -s https://raw.githubusercontent.com/nrmjyhwerv/hosting-panel/refs/heads/main/vps)
+
+ bash <(curl -s https://raw.githubusercontent.com/nrmjyhwerv/hosting-panel/refs/heads/main/node)
+
+ npm run configure -- --panel http://localhost:3000 --key ae3305a4-57fe-470d-898b-ec094f9784c3
