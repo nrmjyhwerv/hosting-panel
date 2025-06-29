@@ -1,3 +1,5 @@
+#!/bin/bash
+
 while true; do
     echo "Starting node..."
     node index.js
