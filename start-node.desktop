@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Start Node App
+Exec=gnome-terminal -- bash -c "/full/path/to/start.sh; exec bash"
+Terminal=false
