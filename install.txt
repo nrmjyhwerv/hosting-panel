@@ -16,7 +16,16 @@ while true; do
     sleep 5
 done
 
+start-node.desktop
+
+[Desktop Entry]
+Type=Application
+Name=Start Node App
+Exec=gnome-terminal -- bash -c "/full/path/to/start.sh; exec bash"
+Terminal=false
+
 
 to run
 
-chmod +x start.sh
+chmod +x start-node.desktop
+
