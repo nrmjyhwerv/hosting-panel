@@ -3,3 +3,19 @@
  bash <(curl -s https://raw.githubusercontent.com/nrmjyhwerv/hosting-panel/refs/heads/main/node)
 
  npm run configure -- --panel http://localhost:3000 --key ae3305a4-57fe-470d-898b-ec094f9784c3
+
+
+start.sh
+
+#!/bin/bash
+
+while true; do
+    echo "Starting node..."
+    node index.js
+    echo "Node crashed with exit code $? - restarting in 5 seconds..."
+    sleep 5
+done
+
+to run
+
+chmod +x start.sh
