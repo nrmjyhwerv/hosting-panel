@@ -49,27 +49,6 @@ chmod +x start.sh
 
 ---
 
-## 🖥️ Create Desktop Shortcut (Ubuntu GNOME)
-
-Create a file named `start-node.desktop`:
-
-```ini
-[Desktop Entry]
-Type=Application
-Name=Start Node App
-Exec=gnome-terminal -- bash -c "/full/path/to/start.sh; exec bash"
-Terminal=false
-```
-
-> 🔁 Replace `/full/path/to/start.sh` with the actual path to your `start.sh` file.
-
-Make it executable:
-
-```bash
-chmod +x start-node.desktop
-```
-
----
 
 ## ✅ Launching the App
 
