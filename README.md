@@ -40,18 +40,3 @@ while true; do
     sleep 5
 done
 ```
-
-Make it executable:
-
-```bash
-chmod +x start.sh
-```
-
----
-
-
-## ✅ Launching the App
-
-Double-click `start-node.desktop` to run the Node app in a terminal window with automatic crash recovery.
-
----
