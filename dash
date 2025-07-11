@@ -53,10 +53,10 @@ echo_message "* Installed Dependencies"
 echo_message "* Installing Files"
 
 # Create directory, clone repository, and install files
-git clone https://github.com/nrmjyhwerv/ewvbwer.git && cd ewvbwer && nano .env
+git clone https://github.com/nrmjyhwerv/dash.git && cd dash && nano .env
 
 
 echo_message "* Installed Files"
 echo_message "* Starting cryptalis"
 
-echo "* cryptalis Installed and Started on Port 3001"
+echo "* cryptalis Installed and Started on Port 25002"
