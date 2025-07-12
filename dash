@@ -53,7 +53,7 @@ echo_message "* Installed Dependencies"
 echo_message "* Installing Files"
 
 # Create directory, clone repository, and install files
-git clone https://github.com/nrmjyhwerv/dash.git && cd dash && nano .env
+git clone https://github.com/nrmjyhwerv/dash.git && cd dash && npm install && nano .env
 
 
 echo_message "* Installed Files"
