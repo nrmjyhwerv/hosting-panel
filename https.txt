@@ -1,13 +1,16 @@
+# Update package list
 sudo apt update
-sudo apt install certbot
+
+# Install Certbot and nginx plugin
+sudo apt install -y certbot nginx
+
+# Obtain SSL certificate using standalone mode
 sudo certbot certonly --standalone -d www.hostcryptalis.org
 
-
-sudo nano /etc/nginx/sites-available/www.hostcryptalis.org
-
-# HTTPS on port 3000
+# Create nginx config file
+sudo tee /etc/nginx/sites-available/www.hostcryptalis.org > /dev/null <<EOL
 server {
-    listen 3000 ssl;
+    listen 443 ssl;
     server_name www.hostcryptalis.org;
 
     ssl_certificate /etc/letsencrypt/live/www.hostcryptalis.org/fullchain.pem;
@@ -15,24 +18,39 @@ server {
 
     location / {
         proxy_pass http://localhost:3000;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
 
 server {
-    listen 25002 ssl;
+    listen 80;
     server_name www.hostcryptalis.org;
 
-    ssl_certificate /etc/letsencrypt/live/www.hostcryptalis.org/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/www.hostcryptalis.org/privkey.pem;
-
-    location / {
-        proxy_pass http://localhost:25002;
-    }
+    # Redirect all HTTP to HTTPS
+    return 301 https://\$host\$request_uri;
 }
+EOL
 
-sudo nginx -t
-sudo systemctl restart nginx
-
+# Enable the site by creating symlink
 sudo ln -s /etc/nginx/sites-available/www.hostcryptalis.org /etc/nginx/sites-enabled/
 
+# Test nginx configuration for syntax errors
+sudo nginx -t
+
+# Reload nginx to apply changes
 sudo systemctl reload nginx
+
+# Setup cron job for automatic certificate renewal and nginx reload
+# (runs twice daily at midnight and noon)
+sudo tee /etc/cron.d/certbot-renew > /dev/null <<EOL
+0 0,12 * * * root certbot renew --quiet --post-hook "systemctl reload nginx"
+EOL
+
+# Check if cron job is registered
+cat /etc/cron.d/certbot-renew
+
+# Test renewal dry run (optional)
+sudo certbot renew --dry-run
