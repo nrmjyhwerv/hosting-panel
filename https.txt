@@ -1,0 +1,38 @@
+sudo apt update
+sudo apt install certbot
+sudo certbot certonly --standalone -d www.hostcryptalis.org
+
+
+sudo nano /etc/nginx/sites-available/www.hostcryptalis.org
+
+# HTTPS on port 3000
+server {
+    listen 3000 ssl;
+    server_name www.hostcryptalis.org;
+
+    ssl_certificate /etc/letsencrypt/live/www.hostcryptalis.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/www.hostcryptalis.org/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}
+
+server {
+    listen 25002 ssl;
+    server_name www.hostcryptalis.org;
+
+    ssl_certificate /etc/letsencrypt/live/www.hostcryptalis.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/www.hostcryptalis.org/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:25002;
+    }
+}
+
+sudo nginx -t
+sudo systemctl restart nginx
+
+sudo ln -s /etc/nginx/sites-available/www.hostcryptalis.org /etc/nginx/sites-enabled/
+
+sudo systemctl reload nginx
