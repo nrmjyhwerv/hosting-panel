@@ -1,20 +1,20 @@
-Name: @
-Type: A
-Value: YOUR_VPS_IP
-TTL: 300
+# DNS
+# Name: @
+# Type: A
+# Value: YOUR_VPS_IP
+# TTL: 300
 
-2️⃣ Install Nginx and Certbot
+# 2️⃣ Install Nginx and Certbot
 sudo apt update
 sudo apt install nginx python3-certbot-nginx -y
 
-3️⃣ Allow HTTPS in Firewall
-
+# 3️⃣ Allow HTTPS in Firewall
 sudo ufw allow 'Nginx Full'
 sudo ufw allow 3000
 sudo ufw allow 25002
 
-4️⃣ Create Nginx Reverse Proxy for Each Port
-sudo nano /etc/nginx/sites-available/port3000.conf
+# 4️⃣ Create Nginx Reverse Proxy for Both Ports in ONE Config
+sudo nano /etc/nginx/sites-available/hostcryptalis.conf
 
 server {
     listen 80;
@@ -28,14 +28,6 @@ server {
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
     }
-}
-
-
-sudo nano /etc/nginx/sites-available/port25002.conf
-
-server {
-    listen 80;
-    server_name hostcryptalis.org;
 
     location /25002/ {
         proxy_pass http://127.0.0.1:25002;
@@ -47,17 +39,15 @@ server {
     }
 }
 
-5️⃣ Enable Configs
-sudo ln -s /etc/nginx/sites-available/port3000.conf /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/port25002.conf /etc/nginx/sites-enabled/
+# 5️⃣ Enable Config & Check Auto-Renew
+sudo ln -s /etc/nginx/sites-available/hostcryptalis.conf /etc/nginx/sites-enabled/
 sudo nginx -t
+sudo systemctl enable --now certbot.timer
 sudo systemctl restart nginx
 
-
-6️⃣ Get SSL Certificate
+# 6️⃣ Get SSL Certificate
 sudo certbot --nginx -d hostcryptalis.org
 
-
-7️⃣ Access with HTTPS
-https://hostcryptalis.org/         → proxy to 3000
-https://hostcryptalis.org/25002/   → proxy to 25002
+# 7️⃣ Access with HTTPS
+# https://hostcryptalis.org/         → proxy to 3000
+# https://hostcryptalis.org/25002/   → proxy to 25002
