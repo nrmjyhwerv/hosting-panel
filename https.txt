@@ -1,53 +1,77 @@
-# DNS
-# Name: @
-# Type: A
-# Value: YOUR_VPS_IP
-# TTL: 300
-
-# 2️⃣ Install Nginx and Certbot
+# 1️⃣ Install Nginx & Certbot
 sudo apt update
-sudo apt install nginx python3-certbot-nginx -y
+sudo apt install nginx python3-certbot-nginx ufw -y
 
-# 3️⃣ Allow HTTPS in Firewall
-sudo ufw allow 'Nginx Full'
+# 2️⃣ Allow firewall ports
+sudo ufw allow 80
+sudo ufw allow 443
 sudo ufw allow 3000
 sudo ufw allow 25002
 
-# 4️⃣ Create Nginx Reverse Proxy for Both Ports in ONE Config
-sudo nano /etc/nginx/sites-available/hostcryptalis.conf
-
+# 3️⃣ Temporary server block for cert request (port 80 only)
+sudo bash -c 'cat > /etc/nginx/sites-available/temp-cert.conf <<EOF
 server {
     listen 80;
     server_name hostcryptalis.org;
+    location / {
+        root /var/www/html;
+    }
+}
+EOF'
+sudo ln -s /etc/nginx/sites-available/temp-cert.conf /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+
+# 4️⃣ Get SSL certificate (via port 80)
+sudo certbot certonly --nginx -d hostcryptalis.org --non-interactive --agree-tos -m youremail@example.com
+
+# 5️⃣ Remove temp config
+sudo rm /etc/nginx/sites-enabled/temp-cert.conf
+
+# 6️⃣ Create HTTPS configs for ports 3000 & 25002
+sudo bash -c 'cat > /etc/nginx/sites-available/ssl-ports.conf <<EOF
+server {
+    listen 3000 ssl;
+    server_name hostcryptalis.org;
+
+    ssl_certificate /etc/letsencrypt/live/hostcryptalis.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/hostcryptalis.org/privkey.pem;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    location /25002/ {
-        proxy_pass http://127.0.0.1:25002;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
     }
 }
 
-# 5️⃣ Enable Config & Check Auto-Renew
-sudo ln -s /etc/nginx/sites-available/hostcryptalis.conf /etc/nginx/sites-enabled/
+server {
+    listen 25002 ssl;
+    server_name hostcryptalis.org;
+
+    ssl_certificate /etc/letsencrypt/live/hostcryptalis.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/hostcryptalis.org/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:25002;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+    }
+}
+EOF'
+
+# 7️⃣ Enable new config
+sudo ln -s /etc/nginx/sites-available/ssl-ports.conf /etc/nginx/sites-enabled/
 sudo nginx -t
-sudo systemctl enable --now certbot.timer
 sudo systemctl restart nginx
 
-# 6️⃣ Get SSL Certificate
-sudo certbot --nginx -d hostcryptalis.org
+# 8️⃣ Enable auto-renew
+sudo systemctl enable --now certbot.timer
 
-# 7️⃣ Access with HTTPS
-# https://hostcryptalis.org/         → proxy to 3000
-# https://hostcryptalis.org/25002/   → proxy to 25002
+# 9️⃣ Test renewal
+sudo certbot renew --dry-run
